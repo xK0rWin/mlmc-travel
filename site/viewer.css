@@ -47,11 +47,11 @@ h1 { margin: 0; font-size: 19px; letter-spacing: .025em; }
 #grid line { stroke: #1d2731; stroke-width: 1; vector-effect: non-scaling-stroke; }
 #grid line.axis { stroke: #526273; }
 #grid text { fill: #657386; font-size: 54px; }
-.edge { fill: none; stroke: #647184; stroke-width: 8; opacity: .72; marker-end: url(#arrow); vector-effect: non-scaling-stroke; }
+.edge { fill: none; stroke: #647184; stroke-width: 3; stroke-linecap: round; opacity: .72; marker-end: url(#arrow); vector-effect: non-scaling-stroke; }
 .edge.dim { opacity: .1; }
 .edge.out { stroke: var(--green); opacity: 1; }
 .edge.in { stroke: var(--blue); opacity: 1; }
-.edge.on-route { stroke: var(--red); stroke-width: 13; opacity: 1; marker-end: url(#arrow-route); }
+.edge.on-route { stroke: var(--red); stroke-width: 5; opacity: 1; marker-end: url(#arrow-route); }
 #arrow path { fill: #647184; }
 #arrow-route path { fill: var(--red); }
 .node-group { cursor: pointer; }
