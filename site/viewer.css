@@ -55,10 +55,10 @@ h1 { margin: 0; font-size: 19px; letter-spacing: .025em; }
 #arrow path { fill: #647184; }
 #arrow-route path { fill: var(--red); }
 .node-group { cursor: pointer; }
-.node-group circle { fill: var(--green-dark); stroke: #b4f1bd; stroke-width: 7; vector-effect: non-scaling-stroke; }
-.node-group.warn circle { fill: #a66b22; stroke: #ffd083; }
-.node-group.full circle { fill: #963f38; stroke: #ff9e96; }
-.node-group.selected circle { stroke: #fff; stroke-width: 12; filter: drop-shadow(0 0 22px rgba(255,255,255,.45)); }
+.node-group circle { fill: #4f9e58; stroke: #080b0f; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.node-group.warn circle { fill: #c98f2c; }
+.node-group.full circle { fill: #b9493f; }
+.node-group.selected circle { stroke: #fff; stroke-width: 3; filter: drop-shadow(0 0 12px rgba(255,255,255,.35)); }
 .node-group.dim { opacity: .22; }
 .node-group text { fill: var(--text); font-size: 68px; font-weight: 650; text-anchor: middle; paint-order: stroke; stroke: #080b0f; stroke-width: 15px; stroke-linejoin: round; }
 

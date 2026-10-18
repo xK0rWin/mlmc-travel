@@ -144,7 +144,8 @@
   function updateRoute() {
     const from = Number($('routeFrom').value), to = Number($('routeTo').value);
     state.route = from && to && from !== to ? shortestPath(from, to) : null;
-    if (!from || !to) $('routeResult').textContent = 'Select two cities to display the shortest route.';
+    $('routeResult').hidden = !from || !to;
+    if (!from || !to) $('routeResult').textContent = '';
     else if (from === to) $('routeResult').textContent = 'Start and destination are the same city.';
     else if (!state.route) $('routeResult').textContent = 'No directed route is available.';
     else $('routeResult').textContent = `${state.route.length - 1} hop${state.route.length === 2 ? '' : 's'} · ${state.route.map(id => city(id).name).join(' → ')}`;
