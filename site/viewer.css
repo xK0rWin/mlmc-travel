@@ -59,6 +59,7 @@ h1 { margin: 0; font-size: 19px; letter-spacing: .025em; }
 #arrow path { fill: #647184; }
 #arrow-route path { fill: var(--red); }
 .node-group { cursor: pointer; }
+.node-group:focus { outline: none; }
 .node-group circle { fill: #4f9e58; stroke: #080b0f; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .node-group.warn circle { fill: #c98f2c; }
 .node-group.full circle { fill: #b9493f; }
