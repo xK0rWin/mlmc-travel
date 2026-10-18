@@ -26,7 +26,6 @@
       bindControls();
       fillRoutes();
       render();
-      $('summary').textContent = `${state.data.cities.length} cities · ${state.data.links.length} directed links · read-only`;
       $('loading').hidden = true;
     } catch (error) {
       $('loading').hidden = true;
