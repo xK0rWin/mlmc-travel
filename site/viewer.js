@@ -69,7 +69,13 @@
       group.append(svg('line', { x1: value, y1: MAP_MIN, x2: value, y2: MAP_MAX, class: value === 0 ? 'axis' : '' }));
       group.append(svg('line', { x1: MAP_MIN, y1: value, x2: MAP_MAX, y2: value, class: value === 0 ? 'axis' : '' }));
       const tx = svg('text', { x: value + 25, y: MAP_MIN - 70 }); tx.textContent = `X ${value.toLocaleString('en-US')}`;
-      const tz = svg('text', { x: MAP_MIN + 25, y: value - 25 }); tz.textContent = `Z ${value.toLocaleString('en-US')}`;
+      const tz = svg('text', {
+        x: MAP_MIN - 70,
+        y: value,
+        'text-anchor': 'end',
+        'dominant-baseline': 'middle',
+      });
+      tz.textContent = `Z ${value.toLocaleString('en-US')}`;
       group.append(tx, tz);
     }
   }
