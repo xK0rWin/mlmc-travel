@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const MAP_MIN = -2500, MAP_MAX = 2500;
-  const state = { data: null, layout: 'map', selected: null, route: null };
+  const state = { data: null, layout: 'map', selected: null, route: null, hovered: null, radiusChunks: 30 };
   const view = { x: 0, y: 0, k: 1, user: false };
   const positions = new Map(), edgeEls = [], nodeEls = new Map();
 
@@ -55,6 +55,7 @@
   function render() {
     layoutPositions();
     drawGrid();
+    drawRadiusOverlay();
     drawEdges();
     drawNodes();
     applyHighlight();
@@ -63,7 +64,7 @@
 
   function drawGrid() {
     const group = $('grid'); group.replaceChildren();
-    if (state.layout !== 'map') return;
+    if (state.layout === 'circle') return;
     group.append(svg('rect', { x: MAP_MIN, y: MAP_MIN, width: MAP_MAX - MAP_MIN, height: MAP_MAX - MAP_MIN }));
     for (let value = MAP_MIN; value <= MAP_MAX; value += 500) {
       group.append(svg('line', { x1: value, y1: MAP_MIN, x2: value, y2: MAP_MAX, class: value === 0 ? 'axis' : '' }));
@@ -78,6 +79,14 @@
       tz.textContent = `Z ${value.toLocaleString('en-US')}`;
       group.append(tx, tz);
     }
+  }
+
+  function drawRadiusOverlay() {
+    const group = $('radiusOverlay'); group.replaceChildren();
+    if (state.layout !== 'radius' || !state.hovered) return;
+    const center = city(state.hovered);
+    if (!center || !hasCoords(center)) return;
+    group.append(svg('circle', { cx: center.x, cy: center.z, r: state.radiusChunks * 16 }));
   }
 
   function edgePath(from, to, reciprocal) {
@@ -116,8 +125,18 @@
       node.append(circle, label, title);
       node.addEventListener('click', event => { event.stopPropagation(); selectCity(item.id); });
       node.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') selectCity(item.id); });
+      node.addEventListener('pointerenter', () => setHoveredCity(item.id));
+      node.addEventListener('pointerleave', () => setHoveredCity(null));
+      node.addEventListener('focus', () => setHoveredCity(item.id));
+      node.addEventListener('blur', () => setHoveredCity(null));
       group.append(node); nodeEls.set(item.id, node);
     }
+  }
+
+  function setHoveredCity(id) {
+    state.hovered = state.layout === 'radius' ? id : null;
+    drawRadiusOverlay();
+    applyHighlight();
   }
 
   function selectCity(id) {
@@ -159,6 +178,8 @@
 
   function applyHighlight() {
     const routeNodes = new Set(state.route || []), routeEdges = new Set();
+    const radiusCenter = state.layout === 'radius' && state.hovered ? city(state.hovered) : null;
+    const radiusBlocks = state.radiusChunks * 16;
     if (state.route) for (let i = 0; i + 1 < state.route.length; i++) routeEdges.add(`${state.route[i]}>${state.route[i + 1]}`);
     for (const edge of edgeEls) {
       let className = 'edge';
@@ -167,8 +188,13 @@
       edge.element.setAttribute('class', className);
     }
     for (const [id, node] of nodeEls) {
+      const item = city(id);
+      const inRadius = Boolean(radiusCenter && hasCoords(radiusCenter) && hasCoords(item)
+        && Math.hypot(item.x - radiusCenter.x, item.z - radiusCenter.z) <= radiusBlocks);
       node.classList.toggle('selected', id === state.selected);
       node.classList.toggle('dim', Boolean(state.route) && !routeNodes.has(id));
+      node.classList.toggle('in-radius', inRadius);
+      node.classList.toggle('radius-center', inRadius && id === state.hovered);
     }
   }
 
@@ -190,7 +216,7 @@
     if (!values.length) return;
     let x0 = Math.min(...values.map(p => p.x)), x1 = Math.max(...values.map(p => p.x));
     let y0 = Math.min(...values.map(p => p.y)), y1 = Math.max(...values.map(p => p.y));
-    if (state.layout === 'map') { x0 = Math.min(x0, MAP_MIN); x1 = Math.max(x1, MAP_MAX); y0 = Math.min(y0, MAP_MIN); y1 = Math.max(y1, MAP_MAX); }
+    if (state.layout !== 'circle') { x0 = Math.min(x0, MAP_MIN); x1 = Math.max(x1, MAP_MAX); y0 = Math.min(y0, MAP_MIN); y1 = Math.max(y1, MAP_MAX); }
     const pad = 220, width = graph.clientWidth, height = graph.clientHeight;
     view.k = Math.max(.025, Math.min(.5, (width - pad) / Math.max(1, x1 - x0), (height - pad) / Math.max(1, y1 - y0)));
     view.x = -(x0 + x1) / 2 * view.k;
@@ -200,9 +226,16 @@
 
   function bindControls() {
     $('mapLayout').addEventListener('click', () => setLayout('map'));
+    $('radiusLayout').addEventListener('click', () => setLayout('radius'));
     $('circleLayout').addEventListener('click', () => setLayout('circle'));
     $('fitView').addEventListener('click', fitView);
     $('closeCity').addEventListener('click', () => selectCity(state.selected));
+    $('radiusChunks').addEventListener('input', event => {
+      const value = Math.max(1, Math.min(256, Math.round(Number(event.target.value) || 30)));
+      state.radiusChunks = value;
+      drawRadiusOverlay();
+      applyHighlight();
+    });
     const graph = $('graph');
     let drag = null;
     graph.addEventListener('pointerdown', event => {
@@ -227,8 +260,11 @@
 
   function setLayout(layout) {
     state.layout = layout;
+    state.hovered = null;
     $('mapLayout').classList.toggle('active', layout === 'map');
+    $('radiusLayout').classList.toggle('active', layout === 'radius');
     $('circleLayout').classList.toggle('active', layout === 'circle');
+    $('radiusControl').hidden = layout !== 'radius';
     render();
   }
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interactive read-only map of the Towny teleport network">
   <title>Teleport Network</title>
-  <link rel="stylesheet" href="viewer.css?v=4">
+  <link rel="stylesheet" href="viewer.css?v=7">
 </head>
 <body>
   <header class="topbar">
@@ -16,8 +16,14 @@
     <div class="controls">
       <div class="segmented" role="group" aria-label="Layout">
         <button id="mapLayout" class="active" type="button">Map</button>
+        <button id="radiusLayout" type="button">Radius</button>
         <button id="circleLayout" type="button">Network</button>
       </div>
+      <label id="radiusControl" class="radius-control" hidden>
+        <span>Radius</span>
+        <input id="radiusChunks" type="number" min="1" max="256" step="1" value="30" aria-label="Radius in chunks">
+        <span>chunks</span>
+      </label>
       <button id="fitView" type="button">Fit view</button>
     </div>
   </header>
@@ -34,6 +40,7 @@
       </defs>
       <g id="viewport">
         <g id="grid"></g>
+        <g id="radiusOverlay"></g>
         <g id="edges"></g>
         <g id="nodes"></g>
       </g>
@@ -71,6 +78,6 @@
     <div id="error" class="error" hidden></div>
   </main>
 
-  <script src="viewer.js?v=6"></script>
+  <script src="viewer.js?v=7"></script>
 </body>
 </html>
